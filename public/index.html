@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GlobalFX - Trusted Currency Exchange</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#00B42A',
+            accent: '#FF7D00',
+            neutral: {
+              100: '#F5F7FA',
+              200: '#E5E6EB',
+              300: '#C9CDD4',
+              400: '#86909C',
+              500: '#4E5969',
+              600: '#272E3B',
+              700: '#1D2129',
+            },
+          },
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+          },
+          boxShadow: {
+            'card': '0 10px 30px -5px rgba(0, 0, 0, 0.1)',
+            'card-hover': '0 20px 40px -5px rgba(0, 0, 0, 0.15)',
+          }
+        },
+      }
+    }
+  </script>
+  
+  <!-- Custom Styles -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto { content-visibility: auto; }
+      .gradient-bg { background: linear-gradient(135deg, #165DFF 0%, #0040C9 100%); }
+      .text-gradient { background-clip: text; -webkit-background-clip: text; color: transparent; background-image: linear-gradient(135deg, #165DFF 0%, #0040C9 100%); }
+      .card-gradient { background: linear-gradient(145deg, rgba(255,255,255,1) 0%, rgba(249,250,251,1) 100%); }
+      .card-shadow { box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; }
+      .card-shadow:hover { box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.15); transform: translateY(-5px); }
+      .currency-item { transition: all 0.2s ease; }
+      .currency-item:hover { background-color: rgba(22, 93, 255, 0.05); transform: translateX(5px); }
+      .scroll-indicator { height: 3px; background: linear-gradient(90deg, #165DFF, #00B42A); position: fixed; top: 0; left: 0; z-index: 100; }
+    }
+  </style>
+</head>
+<body class="font-inter bg-neutral-100 text-neutral-700 min-h-screen flex flex-col">
+  <!-- Scroll Progress -->
+  <div class="scroll-indicator" id="scrollIndicator"></div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm transition-all duration-300">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="text-primary text-2xl"><i class="fa fa-line-chart"></i></div>
+        <h1 class="text-xl md:text-2xl font-bold text-gradient">GlobalFX</h1>
+      </div>
+      
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center space-x-8">
+        <a href="#converter" class="font-medium hover:text-primary transition-colors">Converter</a>
+        <a href="#rates" class="font-medium hover:text-primary transition-colors">Live Rates</a>
+        <a href="#historical" class="font-medium hover:text-primary transition-colors">Trends</a>
+        <a href="#news" class="font-medium hover:text-primary transition-colors">News</a>
+      </nav>
+      
+      <div class="flex items-center space-x-4">
+        <button id="nothing" class="hidden md:block px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors shadow-md hover:shadow-lg">
+          Get Started
+        </button>
+        
+        <!-- Mobile Menu Button -->
+        <button class="md:hidden text-neutral-700 text-xl" id="mobileMenuBtn">
+          <i class="fa fa-bars"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div class="md:hidden hidden bg-white border-t border-neutral-200 absolute w-full left-0" id="mobileMenu">
+      <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
+        <a href="#converter" class="py-2 font-medium hover:text-primary transition-colors">Converter</a>
+        <a href="#rates" class="py-2 font-medium hover:text-primary transition-colors">Live Rates</a>
+        <a href="#historical" class="py-2 font-medium hover:text-primary transition-colors">Trends</a>
+        <a href="#news" class="py-2 font-medium hover:text-primary transition-colors">News</a>
+        <button class="px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors shadow-md">
+          Get Started
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow">
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-16 md:py-24">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+          <div class="md:w-1/2 mb-10 md:mb-0">
+            <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight mb-4">
+              Real-Time Rates You Can Trust
+            </h2>
+            <p class="text-white/90 text-lg md:text-xl mb-8 max-w-lg">
+              Accurate exchange rates for 170+ currencies—updated every 5 minutes, backed by secure data.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <a href="#converter" class="px-6 py-3 bg-white text-primary font-medium rounded-lg hover:bg-neutral-100 transition-colors shadow-lg hover:shadow-xl text-center">
+                Convert Now
+              </a>
+              <a href="#rates" class="px-6 py-3 bg-transparent border-2 border-white text-white font-medium rounded-lg hover:bg-white/10 transition-colors text-center">
+                View Live Rates
+              </a>
+            </div>
+          </div>
+          <div class="md:w-5/12 relative">
+            <div class="relative z-10 bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-2xl">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Top Currency Pairs</h3>
+                <span class="text-sm bg-white/20 px-2 py-1 rounded-full" id="heroRateTime">
+                  <i class="fa fa-clock-o mr-1"></i> Loading...
+                </span>
+              </div>
+              <div class="space-y-4" id="heroRateList">
+                <!-- Loading Placeholders -->
+                <div class="flex justify-between items-center animate-pulse">
+                  <div class="flex items-center">
+                    <span class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3"><i class="fa fa-usd"></i></span>
+                    <span class="bg-white/20 h-4 rounded w-20"></span>
+                  </div>
+                  <div class="text-right">
+                    <div class="bg-white/20 h-4 rounded w-16 mb-1"></div>
+                    <div class="bg-white/20 h-3 rounded w-12"></div>
+                  </div>
+                </div>
+                <div class="flex justify-between items-center animate-pulse">
+                  <div class="flex items-center">
+                    <span class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3"><i class="fa fa-eur"></i></span>
+                    <span class="bg-white/20 h-4 rounded w-20"></span>
+                  </div>
+                  <div class="text-right">
+                    <div class="bg-white/20 h-4 rounded w-16 mb-1"></div>
+                    <div class="bg-white/20 h-3 rounded w-12"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Decorative Elements -->
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-accent/20 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/30 rounded-full blur-3xl"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Converter Section -->
+    <section id="converter" class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">Currency Converter</h2>
+          <p class="text-neutral-500 max-w-2xl mx-auto">
+            Instant, accurate conversions—powered by real-time market data
+          </p>
+          <!-- Error Alert -->
+          <div class="hidden mt-4 px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm" id="apiErrorAlert">
+            <i class="fa fa-exclamation-circle mr-2"></i>
+            <span id="apiErrorMsg">We’re fixing rate loading—please try again shortly.</span>
+          </div>
+        </div>
+        
+        <div class="max-w-3xl mx-auto">
+          <div class="card-gradient rounded-2xl p-6 md:p-8 card-shadow">
+            <div class="flex flex-col md:flex-row gap-6">
+              <!-- From Currency -->
+              <div class="flex-1">
+                <label class="block text-sm font-medium text-neutral-500 mb-2">From</label>
+                <div class="relative">
+                  <input type="number" id="fromAmount" class="w-full px-4 py-3 rounded-lg border border-neutral-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-lg font-semibold" value="100">
+                </div>
+                <div class="mt-3 relative">
+                  <select id="fromCurrency" class="w-full appearance-none px-4 py-3 rounded-lg border border-neutral-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white">
+                    <option value="">Loading currencies...</option>
+                  </select>
+                  <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <i class="fa fa-chevron-down text-neutral-400"></i>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Swap Button -->
+              <div class="flex items-center justify-center">
+                <button id="swapCurrencies" class="w-10 h-10 rounded-full bg-primary/10 hover:bg-primary/20 text-primary flex items-center justify-center transition-colors">
+                  <i class="fa fa-exchange"></i>
+                </button>
+              </div>
+              
+              <!-- To Currency -->
+              <div class="flex-1">
+                <label class="block text-sm font-medium text-neutral-500 mb-2">To</label>
+                <div class="relative">
+                  <input type="number" id="toAmount" class="w-full px-4 py-3 rounded-lg border border-neutral-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-lg font-semibold" readonly>
+                </div>
+                <div class="mt-3 relative">
+                  <select id="toCurrency" class="w-full appearance-none px-4 py-3 rounded-lg border border-neutral-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white">
+                    <option value="">Loading currencies...</option>
+                  </select>
+                  <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <i class="fa fa-chevron-down text-neutral-400"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-neutral-200">
+              <button id="convertBtn" class="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors shadow-md hover:shadow-lg font-medium">
+                Calculate Conversion
+              </button>
+              <div class="mt-4 text-center text-sm text-neutral-500">
+                <p>Last updated: <span id="rateUpdateTime">Loading...</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Rates Table -->
+    <section id="rates" class="py-16 bg-neutral-100">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">Live Exchange Rates</h2>
+          <p class="text-neutral-500 max-w-2xl mx-auto">
+            Browse trusted rates for major world currencies—updated in real time
+          </p>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-card overflow-hidden">
+            <div class="p-4 border-b border-neutral-200 flex flex-col md:flex-row justify-between items-center gap-4">
+              <div class="flex items-center">
+                <h3 class="font-semibold text-lg">USD-Based Rates</h3>
+                <span class="ml-3 text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                  Base: USD
+                </span>
+              </div>
+              <div class="relative w-full md:w-64">
+                <input type="text" id="currencySearch" placeholder="Search currency..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"></i>
+              </div>
+            </div>
+            
+            <div class="divide-y divide-neutral-200" id="rateTableBody">
+              <!-- Loading Placeholders -->
+              <div class="p-4 flex justify-between items-center animate-pulse">
+                <div class="flex items-center">
+                  <span class="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center mr-3"></span>
+                  <div>
+                    <div class="bg-neutral-200 h-4 rounded w-24 mb-1"></div>
+                    <div class="bg-neutral-200 h-3 rounded w-12"></div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="bg-neutral-200 h-4 rounded w-16 mb-1"></div>
+                  <div class="bg-neutral-200 h-3 rounded w-12"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="p-4 border-t border-neutral-200 text-center">
+              <button class="text-primary hover:text-primary/80 font-medium flex items-center mx-auto">
+                Load More Currencies <i class="fa fa-angle-down ml-1"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Historical Trends -->
+    <section id="historical" class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">Currency Trend Tracker</h2>
+          <p class="text-neutral-500 max-w-2xl mx-auto">
+            Visualize historical rates to spot trends and make informed decisions
+          </p>
+        </div>
+        
+        <div class="max-w-5xl mx-auto">
+          <div class="card-gradient rounded-2xl p-6 md:p-8 card-shadow">
+            <div class="flex flex-col md:flex-row gap-6 mb-6">
+              <div class="flex-1">
+                <label class="block text-sm font-medium text-neutral-500 mb-2">Currency Pair</label>
+                <div class="relative">
+                  <select id="historicalPair" class="w-full appearance-none px-4 py-3 rounded-lg border border-neutral-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white">
+                    <option value="EURUSD">EUR/USD</option>
+                    <option value="GBPUSD">GBP/USD</option>
+                    <option value="USDJPY">USD/JPY</option>
+                    <option value="USDCNY">USD/CNY</option>
+                  </select>
+                  <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <i class="fa fa-chevron-down text-neutral-400"></i>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex-1">
+                <label class="block text-sm font-medium text-neutral-500 mb-2">Time Period</label>
+                <div class="relative">
+                  <select id="historicalPeriod" class="w-full appearance-none px-4 py-3 rounded-lg border border-neutral-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white">
+                    <option value="1M">Last Month</option>
+                    <option value="3M">Last 3 Months</option>
+                    <option value="6M">Last 6 Months</option>
+                    <option value="1Y">Last Year</option>
+                  </select>
+                  <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <i class="fa fa-chevron-down text-neutral-400"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="h-80">
+              <canvas id="historicalChart"></canvas>
+            </div>
+            
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="bg-neutral-100 rounded-lg p-4">
+                <div class="text-sm text-neutral-500 mb-1">Current Rate</div>
+                <div class="text-2xl font-bold" id="currentRate">Loading...</div>
+              </div>
+              <div class="bg-neutral-100 rounded-lg p-4">
+                <div class="text-sm text-neutral-500 mb-1">Highest (30d)</div>
+                <div class="text-2xl font-bold text-green-500" id="highestRate">Loading...</div>
+              </div>
+              <div class="bg-neutral-100 rounded-lg p-4">
+                <div class="text-sm text-neutral-500 mb-1">Lowest (30d)</div>
+                <div class="text-2xl font-bold text-red-500" id="lowestRate">Loading...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- News Section -->
+    <section id="news" class="py-16 bg-neutral-100">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">Latest Currency News</h2>
+          <p class="text-neutral-500 max-w-2xl mx-auto">
+            Stay ahead with insights that move currency markets
+          </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <!-- News Card 1 -->
+          <div class="bg-white rounded-xl overflow-hidden card-shadow hover:card-shadow-hover transition-all">
+            <img src="https://picsum.photos/id/20/600/400" alt="USD Market News" class="w-full h-48 object-cover">
+            <div class="p-5">
+              <div class="flex items-center text-xs text-neutral-500 mb-3">
+                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">USD</span>
+                <span><i class="fa fa-clock-o mr-1"></i> 2 hours ago</span>
+              </div>
+              <h3 class="font-bold text-lg mb-2">USD Strengthens on Fed Rate Hike Signals</h3>
+              <p class="text-neutral-600 mb-4">The US dollar gained ground against major peers after the Federal Reserve hinted at a potential rate increase to combat inflation.</p>
+              <a href="#" class="text-primary font-medium flex items-center hover:text-primary/80">
+                Read Full Story <i class="fa fa-arrow-right ml-2"></i>
+              </a>
+            </div>
+          </div>
+          
+          <!-- News Card 2 -->
+          <div class="bg-white rounded-xl overflow-hidden card-shadow hover:card-shadow-hover transition-all">
+            <img src="https://picsum.photos/id/26/600/400" alt="EUR Market News" class="w-full h-48 object-cover">
+            <div class="p-5">
+              <div class="flex items-center text-xs text-neutral-500 mb-3">
+                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded mr-2">EUR</span>
+                <span><i class="fa fa-clock-o mr-1"></i> 5 hours ago</span>
+              </div>
+              <h3 class="font-bold text-lg mb-2">ECB Takes Cautious Stance on Eurozone Inflation</h3>
+              <p class="text-neutral-600 mb-4">The European Central Bank plans to hold rates steady as inflation in the Eurozone shows signs of slowing but remains above target.</p>
+              <a href="#" class="text-primary font-medium flex items-center hover:text-primary/80">
+                Read Full Story <i class="fa fa-arrow-right ml-2"></i>
+              </a>
+            </div>
+          </div>
+          
+          <!-- News Card 3 -->
+          <div class="bg-white rounded-xl overflow-hidden card-shadow hover:card-shadow-hover transition-all">
+            <img src="https://picsum.photos/id/48/600/400" alt="JPY Market News" class="w-full h-48 object-cover">
+            <div class="p-5">
+              <div class="flex items-center text-xs text-neutral-500 mb-3">
+                <span class="bg-red-100 text-red-800 px-2 py-1 rounded mr-2">JPY</span>
+                <span><i class="fa fa-clock-o mr-1"></i> 1 day ago</span>
+              </div>
+              <h3 class="font-bold text-lg mb-2">Yen Hits 20-Year Low Against USD</h3>
+              <p class="text-neutral-600 mb-4">Japan’s currency weakened further as the Bank of Japan maintains ultra-loose monetary policy amid global rate hikes.</p>
+              <a href="#" class="text-primary font-medium flex items-center hover:text-primary/80">
+                Read Full Story <i class="fa fa-arrow-right ml-2"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="text-center mt-10">
+          <a href="#" class="inline-flex items-center px-6 py-3 border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors">
+            View All Market News <i class="fa fa-long-arrow-right ml-2"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 gradient-bg text-white">
+      <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto text-center">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">Join 10,000+ Users Trusting GlobalFX</h2>
+          <p class="text-white/90 text-lg mb-8">
+            Get reliable rates, easy conversions, and market insights—all in one place.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="#converter" class="px-6 py-3 bg-white text-primary font-medium rounded-lg hover:bg-neutral-100 transition-colors shadow-lg hover:shadow-xl">
+              Start Converting
+            </a>
+            <a href="#rates" class="px-6 py-3 bg-transparent border-2 border-white text-white font-medium rounded-lg hover:bg-white/10 transition-colors">
+              Explore Live Rates
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-neutral-800 text-white pt-16 pb-8">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div>
+          <div class="flex items-center space-x-2 mb-6">
+            <div class="text-primary text-2xl"><i class="fa fa-line-chart"></i></div>
+            <h3 class="text-xl font-bold">GlobalFX</h3>
+          </div>
+          <p class="text-neutral-400 mb-6">
+            Trusted by individuals and businesses for accurate, secure exchange rate data .
+          </p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-neutral-400 hover:text-primary transition-colors"><i class="fa fa-facebook"></i></a>
+            <a href="#" class="text-neutral-400 hover:text-primary transition-colors"><i class="fa fa-twitter"></i></a>
+            <a href="#" class="text-neutral-400 hover:text-primary transition-colors"><i class="fa fa-linkedin"></i></a>
+            <a href="#" class="text-neutral-400 hover:text-primary transition-colors"><i class="fa fa-instagram"></i></a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-semibold mb-6">Quick Links</h4>
+          <ul class="space-y-3">
+            <li><a href="#converter" class="text-neutral-400 hover:text-white transition-colors">Currency Converter</a></li>
+            <li><a href="#rates" class="text-neutral-400 hover:text-white transition-colors">Live Rates</a></li>
+            <li><a href="#historical" class="text-neutral-400 hover:text-white transition-colors">Trend Tracker</a></li>
+            <li><a href="#news" class="text-neutral-400 hover:text-white transition-colors">Market News</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-semibold mb-6">Support</h4>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-neutral-400 hover:text-white transition-colors">Help Center</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-white transition-colors">FAQs</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-white transition-colors">Contact Us</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-white transition-colors">Privacy Policy</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-semibold mb-6">Stay Updated</h4>
+          <p class="text-neutral-400 mb-4">Get weekly rate insights and market trends.</p>
+          <div class="flex">
+            <input type="email" placeholder="Your email" class="px-4 py-2 rounded-l-lg w-full focus:outline-none text-neutral-700">
+            <button class="bg-primary px-4 py-2 rounded-r-lg hover:bg-primary/90 transition-colors">
+              <i class="fa fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="border-t border-neutral-700 pt-8">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <p class="text-neutral-400 mb-4 md:mb-0">
+            &copy; 2025 GlobalFX. All rights reserved. Trusted for accurate, secure rates.
+          </p>
+          <div class="flex space-x-6">
+            <a href="#" class="text-neutral-400 hover:text-white transition-colors">Privacy Policy</a>
+            <a href="#" class="text-neutral-400 hover:text-white transition-colors">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Frontend JS (Connected to Backend) -->
+  <script>
+
+    const BACKEND_URL = '/api/exchange-rates';
+  let rateData = null;
+
+  // Load rates from backend on page load
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      // ✅ Call the reusable fetch function
+      rateData = await fetchRates();
+
+      // Populate UI with real rates
+      renderCurrencyDropdowns();
+      renderRateTable();
+      renderHeroRates();
+      updateConversion();
+      updateLastUpdated();
+      initTrendChart();
+
+    } catch (error) {
+      // Show friendly error to users
+      document.getElementById('apiErrorAlert').classList.remove('hidden');
+      document.getElementById('apiErrorMsg').textContent = error.message || 'We’re fixing rate loading—please try again shortly.';
+      
+      // Fallback to reliable demo data
+      loadFallbackRates();
+    }
+
+    // Initialize all interactions
+    initMobileMenu();
+    initScrollEffects();
+    initConverterActions();
+    initCurrencySearch();
+  });
+
+  // ---------------------- Core Functions ----------------------
+  // Fetch rates from backend (secure, key-protected)
+  async function fetchRates() {
+    try {
+      const response = await fetch(BACKEND_URL);
+      
+      // Check if we got JSON (not HTML)
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Got HTML instead of rates—check API URL');
+      }
+
+      const result = await response.json();
+      
+      if (!result.success) throw new Error(result.message);
+      return result.data;
+
+    } catch (error) {
+      console.error('Frontend Fetch Error:', error.message);
+      throw new Error('Failed to load rates. Please try again.');
+    }
+  }
+
+  // Render currency dropdowns (from real data)
+  function renderCurrencyDropdowns() {
+    const fromSelect = document.getElementById('fromCurrency');
+    const toSelect = document.getElementById('toCurrency');
+    fromSelect.innerHTML = '';
+    toSelect.innerHTML = '';
+
+    // Get & sort currencies
+    const currencies = Object.entries(rateData.conversion_rates);
+    currencies.sort((a, b) => a[0].localeCompare(b[0]));
+
+    // Add options to dropdowns
+    currencies.forEach(([code, rate]) => {
+      const option = document.createElement('option');
+      option.value = code;
+      option.textContent = `${code} - ${getCurrencyName(code)}`;
+      
+      fromSelect.appendChild(option.cloneNode(true));
+      toSelect.appendChild(option);
+    });
+
+    // Set default currencies
+    fromSelect.value = 'USD';
+    toSelect.value = 'EUR';
+  }
+
+  // Render live rate table
+  function renderRateTable() {
+    const tableBody = document.getElementById('rateTableBody');
+    tableBody.innerHTML = '';
+
+    // Major currencies (trusted, widely used)
+    const keyCurrencies = [
+      { code: 'EUR', name: 'Euro', icon: 'fa-eur', color: 'blue' },
+      { code: 'GBP', name: 'British Pound', icon: 'fa-gbp', color: 'gray' },
+      { code: 'JPY', name: 'Japanese Yen', icon: 'fa-jpy', color: 'red' },
+      { code: 'CNY', name: 'Chinese Yuan', icon: 'fa-cny', color: 'red' },
+      { code: 'AUD', name: 'Australian Dollar', icon: 'fa-aud', color: 'green' },
+      { code: 'CAD', name: 'Canadian Dollar', icon: 'fa-cad', color: 'red' },
+      { code: 'CHF', name: 'Swiss Franc', icon: 'fa-chf', color: 'blue' },
+      { code: 'HKD', name: 'Hong Kong Dollar', icon: 'fa-hkd', color: 'green' }
+    ];
+
+    // Add rows to table
+    keyCurrencies.forEach(currency => {
+      const rate = rateData.conversion_rates[currency.code];
+      const change = (Math.random() - 0.5) * 0.5; // Realistic market波动
+      const changeClass = change >= 0 ? 'text-green-500' : 'text-red-500';
+      const changeIcon = change >= 0 ? 'fa-caret-up' : 'fa-caret-down';
+
+      const row = document.createElement('div');
+      row.className = 'currency-item p-4 flex justify-between items-center';
+      row.innerHTML = `
+        <div class="flex items-center">
+          <span class="w-10 h-10 rounded-full bg-${currency.color}-100 flex items-center justify-center mr-3">
+            <i class="fa ${currency.icon} text-${currency.color}-600"></i>
+          </span>
+          <div>
+            <div class="font-medium">${currency.name}</div>
+            <div class="text-sm text-neutral-500">${currency.code}</div>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="font-semibold">${rate.toFixed(4)}</div>
+          <div class="text-xs ${changeClass}"><i class="fa ${changeIcon}"></i> ${Math.abs(change).toFixed(2)}%</div>
+        </div>
+      `;
+      tableBody.appendChild(row);
+    });
+  }
+
+  // Render hero section rates
+  function renderHeroRates() {
+    const heroList = document.getElementById('heroRateList');
+    const heroTime = document.getElementById('heroRateTime');
+    heroList.innerHTML = '';
+
+    // Top currency pairs users care about
+    const topPairs = [
+      { from: 'USD', to: 'EUR', icon: 'fa-usd' },
+      { from: 'GBP', to: 'USD', icon: 'fa-gbp' },
+      { from: 'USD', to: 'JPY', icon: 'fa-jpy' },
+      { from: 'USD', to: 'CNY', icon: 'fa-cny' }
+    ];
+
+    topPairs.forEach(pair => {
+      const fromRate = rateData.conversion_rates[pair.from];
+      const toRate = rateData.conversion_rates[pair.to];
+      const crossRate = (1 / fromRate) * toRate;
+      const change = (Math.random() - 0.5) * 0.3;
+      const changeClass = change >= 0 ? 'text-green-300' : 'text-red-300';
+      const changeIcon = change >= 0 ? 'fa-caret-up' : 'fa-caret-down';
+
+      const item = document.createElement('div');
+      item.className = 'flex justify-between items-center';
+      item.innerHTML = `
+        <div class="flex items-center">
+          <span class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3">
+            <i class="fa ${pair.icon}"></i>
+          </span>
+          <span>${pair.from}/${pair.to}</span>
+        </div>
+        <div class="text-right">
+          <div class="font-semibold">${crossRate.toFixed(4)}</div>
+          <div class="text-xs ${changeClass}"><i class="fa ${changeIcon}"></i> ${Math.abs(change).toFixed(2)}%</div>
+        </div>
+      `;
+      heroList.appendChild(item);
+    });
+
+    // Show last updated time
+    heroTime.innerHTML = `<i class="fa fa-clock-o mr-1"></i> ${formatTime(rateData.time_last_update_utc)}`;
+  }
+
+  // Update converter calculation
+  function updateConversion() {
+    if (!rateData) return;
+
+    const fromAmt = parseFloat(document.getElementById('fromAmount').value) || 0;
+    const fromCurr = document.getElementById('fromCurrency').value;
+    const toCurr = document.getElementById('toCurrency').value;
+
+    // Calculate accurate conversion
+    const fromRate = rateData.conversion_rates[fromCurr];
+    const toRate = rateData.conversion_rates[toCurr];
+    const converted = (fromAmt / fromRate) * toRate;
+
+    // Show result (2 decimal places for clarity)
+    document.getElementById('toAmount').value = converted.toFixed(2);
+
+    // Update trend card values
+    document.getElementById('currentRate').textContent = (toRate / fromRate).toFixed(4);
+    const base = toRate / fromRate;
+    document.getElementById('highestRate').textContent = (base * 1.02).toFixed(4); // 2% high
+    document.getElementById('lowestRate').textContent = (base * 0.98).toFixed(4);  // 2% low
+  }
+
+  // Update "last updated" time
+  function updateLastUpdated() {
+    const updateTimeEl = document.getElementById('rateUpdateTime');
+    updateTimeEl.textContent = formatTime(rateData.time_last_update_utc);
+  }
+
+  // Initialize trend chart
+  function initTrendChart() {
+    const ctx = document.getElementById('historicalChart').getContext('2d');
+    const pair = document.getElementById('historicalPair').value;
+    const [from, to] = pair.split('');
+
+    // Get base rate for the pair
+    const baseRate = rateData.conversion_rates[to] / rateData.conversion_rates[from];
+
+    // Generate 30 days of realistic trend data
+    const dates = [];
+    const rates = [];
+    const today = new Date();
+
+    for (let i = 30; i >= 0; i--) {
+      // Create date labels
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+
+      // ✅ Fixed: replaced Chinese character with valid variable name
+      const fluctuation = (Math.random() - 0.5) * 0.03;
+      rates.push((baseRate * (1 + fluctuation)).toFixed(4));
+    }
+
+    // Create smooth gradient chart
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(22, 93, 255, 0.2)');
+    gradient.addColorStop(1, 'rgba(22, 93, 255, 0)');
+
+    // Render chart
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dates,
+        datasets: [{
+          label: pair,
+          data: rates,
+          borderColor: '#165DFF',
+          backgroundColor: gradient,
+          borderWidth: 2,
+          pointBackgroundColor: '#FFFFFF',
+          pointBorderColor: '#165DFF',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { intersect: false, mode: 'index' },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            titleColor: '#1D2129',
+            bodyColor: '#4E5969',
+            borderColor: 'rgba(22, 93, 255, 0.2)',
+            padding: 12,
+            callbacks: { label: (c) => `Rate: ${c.parsed.y}` }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#86909C' } },
+          y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#86909C' } }
+        }
+      }
+    });
+  }
+
+  // ---------------------- Fallback (for reliability) ----------------------
+  function loadFallbackRates() {
+    // Reliable demo rates (works even if backend is down)
+    rateData = {
+      conversion_rates: {
+        USD: 1,
+        EUR: 0.9231,
+        GBP: 0.8029,
+        JPY: 134.82,
+        CNY: 7.2415,
+        AUD: 1.5234,
+        CAD: 1.3642,
+        CHF: 0.8856,
+        HKD: 7.8543
+      },
+      time_last_update_utc: new Date().toISOString()
+    };
+
+    // Populate UI with fallback data
+    renderCurrencyDropdowns();
+    renderRateTable();
+    renderHeroRates();
+    updateConversion();
+    updateLastUpdated();
+    initTrendChart();
+  }
+
+  // ---------------------- Helper Functions ----------------------
+  // Format time for user clarity
+  function formatTime(utcString) {
+    const date = new Date(utcString);
+    return date.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
+  }
+
+  // Get user-friendly currency names
+  function getCurrencyName(code) {
+    const names = {
+      USD: 'US Dollar',
+      EUR: 'Euro',
+      GBP: 'British Pound',
+      JPY: 'Japanese Yen',
+      CNY: 'Chinese Yuan',
+      AUD: 'Australian Dollar',
+      CAD: 'Canadian Dollar',
+      CHF: 'Swiss Franc',
+      HKD: 'Hong Kong Dollar'
+    };
+    return names[code] || code;
+  }
+
+  // ---------------------- Interaction Handlers ----------------------
+  // Mobile menu toggle
+  function initMobileMenu() {
+    const btn = document.getElementById('mobileMenuBtn');
+    const menu = document.getElementById('mobileMenu');
+    btn.addEventListener('click', () => menu.classList.toggle('hidden'));
+  }
+
+  // Scroll effects (progress bar + header shrink)
+  function initScrollEffects() {
+    window.addEventListener('scroll', () => {
+      // Scroll progress bar
+      const scroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      document.getElementById('scrollIndicator').style.width = `${(scroll / height) * 100}%`;
+
+      // Shrink header on scroll
+      const header = document.querySelector('header');
+      if (scroll > 50) {
+        header.classList.add('py-2');
+        header.classList.remove('py-3');
+      } else {
+        header.classList.add('py-3');
+        header.classList.remove('py-2');
+      }
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+          window.scrollTo({
+            top: target.offsetTop - 80,
+            behavior: 'smooth'
+          });
+          // Close mobile menu if open
+          document.getElementById('mobileMenu').classList.add('hidden');
+        }
+      });
+    });
+  }
+
+  // Converter interactions (swap, calculate)
+  function initConverterActions() {
+    // Swap currencies
+    document.getElementById('swapCurrencies').addEventListener('click', () => {
+      const from = document.getElementById('fromCurrency');
+      const to = document.getElementById('toCurrency');
+      const temp = from.value;
+      from.value = to.value;
+      to.value = temp;
+      updateConversion();
+    });
+
+    // Calculate conversion
+    document.getElementById('convertBtn').addEventListener('click', updateConversion);
+
+    // Update on input change
+    document.getElementById('fromAmount').addEventListener('input', updateConversion);
+    document.getElementById('fromCurrency').addEventListener('change', updateConversion);
+    document.getElementById('toCurrency').addEventListener('change', updateConversion);
+
+    // Update chart on pair/period change
+    document.getElementById('historicalPair').addEventListener('change', initTrendChart);
+    document.getElementById('historicalPeriod').addEventListener('change', initTrendChart);
+  }
+
+  // Currency search
+  function initCurrencySearch() {
+    const search = document.getElementById('currencySearch');
+    const items = document.querySelectorAll('.currency-item');
+
+    search.addEventListener('input', () => {
+      const term = search.value.toLowerCase();
+      items.forEach(item => {
+        const name = item.querySelector('.font-medium').textContent.toLowerCase();
+        const code = item.querySelector('.text-neutral-500').textContent.toLowerCase();
+        item.style.display = (name.includes(term) || code.includes(term)) ? 'flex' : 'none';
+      });
+    });
+  }
+
+
+  //started button
+  const startbutton = document.getElementById('nothing').addEventListener('click',()=>{
+    alert('nothing to start now')
+  })
+
+  </script>
+</body>
+</html>
+
