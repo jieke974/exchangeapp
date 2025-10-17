@@ -52,6 +52,7 @@
       .currency-item { transition: all 0.2s ease; }
       .currency-item:hover { background-color: rgba(22, 93, 255, 0.05); transform: translateX(5px); }
       .scroll-indicator { height: 3px; background: linear-gradient(90deg, #165DFF, #00B42A); position: fixed; top: 0; left: 0; z-index: 100; }
+      .video-card-thumb { aspect-ratio: 16/9; object-fit: cover; }
     }
   </style>
 </head>
@@ -276,8 +277,10 @@
             </div>
             
             <div class="p-4 border-t border-neutral-200 text-center">
-              <button class="text-primary hover:text-primary/80 font-medium flex items-center mx-auto">
-                Load More Currencies <i class="fa fa-angle-down ml-1"></i>
+              <button id="loadMoreCurrenciesBtn" class="text-primary hover:text-primary/80 font-medium flex items-center mx-auto">
+                <span id="loadMoreText">Load More Currencies</span>
+                <i class="fa fa-angle-down ml-1"></i>
+                <i class="fa fa-spinner fa-spin ml-1 hidden" id="loadMoreSpinner"></i>
               </button>
             </div>
           </div>
@@ -339,11 +342,11 @@
                 <div class="text-2xl font-bold" id="currentRate">Loading...</div>
               </div>
               <div class="bg-neutral-100 rounded-lg p-4">
-                <div class="text-sm text-neutral-500 mb-1">Highest (30d)</div>
+                <div class="text-sm text-neutral-500 mb-1">Highest (Period)</div>
                 <div class="text-2xl font-bold text-green-500" id="highestRate">Loading...</div>
               </div>
               <div class="bg-neutral-100 rounded-lg p-4">
-                <div class="text-sm text-neutral-500 mb-1">Lowest (30d)</div>
+                <div class="text-sm text-neutral-500 mb-1">Lowest (Period)</div>
                 <div class="text-2xl font-bold text-red-500" id="lowestRate">Loading...</div>
               </div>
             </div>
@@ -352,70 +355,40 @@
       </div>
     </section>
 
-    <!-- News Section -->
+    <!-- YouTube News Section -->
     <section id="news" class="py-16 bg-neutral-100">
       <div class="container mx-auto px-4">
         <div class="text-center mb-12">
-          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">Latest Currency News</h2>
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">Latest Exchange Rate News</h2>
           <p class="text-neutral-500 max-w-2xl mx-auto">
-            Stay ahead with insights that move currency markets
+            Watch expert analysis and market updates on currency trends
           </p>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          <!-- News Card 1 -->
-          <div class="bg-white rounded-xl overflow-hidden card-shadow hover:card-shadow-hover transition-all">
-            <img src="https://picsum.photos/id/20/600/400" alt="USD Market News" class="w-full h-48 object-cover">
-            <div class="p-5">
-              <div class="flex items-center text-xs text-neutral-500 mb-3">
-                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">USD</span>
-                <span><i class="fa fa-clock-o mr-1"></i> 2 hours ago</span>
-              </div>
-              <h3 class="font-bold text-lg mb-2">USD Strengthens on Fed Rate Hike Signals</h3>
-              <p class="text-neutral-600 mb-4">The US dollar gained ground against major peers after the Federal Reserve hinted at a potential rate increase to combat inflation.</p>
-              <a href="#" class="text-primary font-medium flex items-center hover:text-primary/80">
-                Read Full Story <i class="fa fa-arrow-right ml-2"></i>
-              </a>
-            </div>
-          </div>
-          
-          <!-- News Card 2 -->
-          <div class="bg-white rounded-xl overflow-hidden card-shadow hover:card-shadow-hover transition-all">
-            <img src="https://picsum.photos/id/26/600/400" alt="EUR Market News" class="w-full h-48 object-cover">
-            <div class="p-5">
-              <div class="flex items-center text-xs text-neutral-500 mb-3">
-                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded mr-2">EUR</span>
-                <span><i class="fa fa-clock-o mr-1"></i> 5 hours ago</span>
-              </div>
-              <h3 class="font-bold text-lg mb-2">ECB Takes Cautious Stance on Eurozone Inflation</h3>
-              <p class="text-neutral-600 mb-4">The European Central Bank plans to hold rates steady as inflation in the Eurozone shows signs of slowing but remains above target.</p>
-              <a href="#" class="text-primary font-medium flex items-center hover:text-primary/80">
-                Read Full Story <i class="fa fa-arrow-right ml-2"></i>
-              </a>
-            </div>
-          </div>
-          
-          <!-- News Card 3 -->
-          <div class="bg-white rounded-xl overflow-hidden card-shadow hover:card-shadow-hover transition-all">
-            <img src="https://picsum.photos/id/48/600/400" alt="JPY Market News" class="w-full h-48 object-cover">
-            <div class="p-5">
-              <div class="flex items-center text-xs text-neutral-500 mb-3">
-                <span class="bg-red-100 text-red-800 px-2 py-1 rounded mr-2">JPY</span>
-                <span><i class="fa fa-clock-o mr-1"></i> 1 day ago</span>
-              </div>
-              <h3 class="font-bold text-lg mb-2">Yen Hits 20-Year Low Against USD</h3>
-              <p class="text-neutral-600 mb-4">Japan’s currency weakened further as the Bank of Japan maintains ultra-loose monetary policy amid global rate hikes.</p>
-              <a href="#" class="text-primary font-medium flex items-center hover:text-primary/80">
-                Read Full Story <i class="fa fa-arrow-right ml-2"></i>
-              </a>
-            </div>
+          <!-- YouTube Error Alert -->
+          <div class="hidden mt-4 px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm" id="youtubeErrorAlert">
+            <i class="fa fa-exclamation-circle mr-2"></i>
+            <span id="youtubeErrorMsg">Failed to load videos. Please try again later.</span>
           </div>
         </div>
         
-        <div class="text-center mt-10">
-          <a href="#" class="inline-flex items-center px-6 py-3 border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors">
-            View All Market News <i class="fa fa-long-arrow-right ml-2"></i>
-          </a>
+        <!-- Loading State -->
+        <div id="videoLoading" class="flex justify-center items-center py-12">
+          <div class="text-center">
+            <i class="fa fa-spinner fa-spin text-primary text-2xl mb-4"></i>
+            <p class="text-neutral-500">Loading latest market videos...</p>
+          </div>
+        </div>
+        
+        <!-- Video Container -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto hidden" id="videoContainer">
+          <!-- Videos will be rendered here -->
+        </div>
+        
+        <!-- Load More Button -->
+        <div class="text-center mt-10 hidden" id="loadMoreVideosContainer">
+          <button id="loadMoreVideosBtn" class="inline-flex items-center px-6 py-3 border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition-colors">
+            <span id="loadMoreVideosText">Load More Videos</span>
+            <i class="fa fa-spinner fa-spin ml-2 hidden" id="loadMoreVideosSpinner"></i>
+          </button>
         </div>
       </div>
     </section>
@@ -509,109 +482,125 @@
 
   <!-- Frontend JS (Connected to Backend) -->
   <script>
-
     const BACKEND_URL = '/api/exchange-rates';
-  let rateData = null;
+    const YOUTUBE_API_KEY = "AIzaSyAfgiBC8u6zfJAlfUSa1lF984G6IutFK_U";
+    const YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3/search";
+    let rateData = null;
+    let youtubePageToken = null;
+    let isLoadingMoreCurrencies = false;
+    let moreCurrenciesLoaded = false;
 
-  // Load rates from backend on page load
-  document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      // ✅ Call the reusable fetch function
-      rateData = await fetchRates();
+    // Load rates from backend on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Call the reusable fetch function
+        rateData = await fetchRates();
 
-      // Populate UI with real rates
-      renderCurrencyDropdowns();
-      renderRateTable();
-      renderHeroRates();
-      updateConversion();
-      updateLastUpdated();
-      initTrendChart();
+        // Populate UI with real rates
+        renderCurrencyDropdowns();
+        renderRateTable();
+        renderHeroRates();
+        updateConversion();
+        updateLastUpdated();
+        initTrendChart();
 
-    } catch (error) {
-      // Show friendly error to users
-      document.getElementById('apiErrorAlert').classList.remove('hidden');
-      document.getElementById('apiErrorMsg').textContent = error.message || 'We’re fixing rate loading—please try again shortly.';
-      
-      // Fallback to reliable demo data
-      loadFallbackRates();
-    }
-
-    // Initialize all interactions
-    initMobileMenu();
-    initScrollEffects();
-    initConverterActions();
-    initCurrencySearch();
-  });
-
-  // ---------------------- Core Functions ----------------------
-  // Fetch rates from backend (secure, key-protected)
-  async function fetchRates() {
-    try {
-      const response = await fetch(BACKEND_URL);
-      
-      // Check if we got JSON (not HTML)
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Got HTML instead of rates—check API URL');
+      } catch (error) {
+        // Show friendly error to users
+        document.getElementById('apiErrorAlert').classList.remove('hidden');
+        document.getElementById('apiErrorMsg').textContent = error.message || 'We’re fixing rate loading—please try again shortly.';
+        
+        // Fallback to reliable demo data
+        loadFallbackRates();
       }
 
-      const result = await response.json();
-      
-      if (!result.success) throw new Error(result.message);
-      return result.data;
+      // Initialize YouTube videos
+      await fetchYoutubeVideos();
 
-    } catch (error) {
-      console.error('Frontend Fetch Error:', error.message);
-      throw new Error('Failed to load rates. Please try again.');
-    }
-  }
-
-  // Render currency dropdowns (from real data)
-  function renderCurrencyDropdowns() {
-    const fromSelect = document.getElementById('fromCurrency');
-    const toSelect = document.getElementById('toCurrency');
-    fromSelect.innerHTML = '';
-    toSelect.innerHTML = '';
-
-    // Get & sort currencies
-    const currencies = Object.entries(rateData.conversion_rates);
-    currencies.sort((a, b) => a[0].localeCompare(b[0]));
-
-    // Add options to dropdowns
-    currencies.forEach(([code, rate]) => {
-      const option = document.createElement('option');
-      option.value = code;
-      option.textContent = `${code} - ${getCurrencyName(code)}`;
-      
-      fromSelect.appendChild(option.cloneNode(true));
-      toSelect.appendChild(option);
+      // Initialize all interactions
+      initMobileMenu();
+      initScrollEffects();
+      initConverterActions();
+      initCurrencySearch();
+      initLoadMoreCurrencies();
+      initLoadMoreVideos();
     });
 
-    // Set default currencies
-    fromSelect.value = 'USD';
-    toSelect.value = 'EUR';
-  }
+    // ---------------------- Core Functions ----------------------
+    // Fetch rates from backend (secure, key-protected)
+    async function fetchRates() {
+      try {
+        const response = await fetch(BACKEND_URL);
+        
+        // Check if we got JSON (not HTML)
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Got HTML instead of rates—check API URL');
+        }
 
-  // Render live rate table
-  function renderRateTable() {
-    const tableBody = document.getElementById('rateTableBody');
-    tableBody.innerHTML = '';
+        const result = await response.json();
+        
+        if (!result.success) throw new Error(result.message);
+        return result.data;
 
-    // Major currencies (trusted, widely used)
-    const keyCurrencies = [
-      { code: 'EUR', name: 'Euro', icon: 'fa-eur', color: 'blue' },
-      { code: 'GBP', name: 'British Pound', icon: 'fa-gbp', color: 'gray' },
-      { code: 'JPY', name: 'Japanese Yen', icon: 'fa-jpy', color: 'red' },
-      { code: 'CNY', name: 'Chinese Yuan', icon: 'fa-cny', color: 'red' },
-      { code: 'AUD', name: 'Australian Dollar', icon: 'fa-aud', color: 'green' },
-      { code: 'CAD', name: 'Canadian Dollar', icon: 'fa-cad', color: 'red' },
-      { code: 'CHF', name: 'Swiss Franc', icon: 'fa-chf', color: 'blue' },
-      { code: 'HKD', name: 'Hong Kong Dollar', icon: 'fa-hkd', color: 'green' }
-    ];
+      } catch (error) {
+        console.error('Frontend Fetch Error:', error.message);
+        throw new Error('Failed to load rates. Please try again.');
+      }
+    }
 
-    // Add rows to table
-    keyCurrencies.forEach(currency => {
-      const rate = rateData.conversion_rates[currency.code];
+    // Render currency dropdowns (from real data)
+    function renderCurrencyDropdowns() {
+      const fromSelect = document.getElementById('fromCurrency');
+      const toSelect = document.getElementById('toCurrency');
+      fromSelect.innerHTML = '';
+      toSelect.innerHTML = '';
+
+      // Get & sort currencies
+      const currencies = Object.entries(rateData.conversion_rates);
+      currencies.sort((a, b) => a[0].localeCompare(b[0]));
+
+      // Add options to dropdowns
+      currencies.forEach(([code, rate]) => {
+        const option = document.createElement('option');
+        option.value = code;
+        option.textContent = `${code} - ${getCurrencyName(code)}`;
+        
+        fromSelect.appendChild(option.cloneNode(true));
+        toSelect.appendChild(option);
+      });
+
+      // Set default currencies
+      fromSelect.value = 'USD';
+      toSelect.value = 'EUR';
+    }
+
+    // Render live rate table (base + initial currencies)
+    function renderRateTable() {
+      const tableBody = document.getElementById('rateTableBody');
+      tableBody.innerHTML = '';
+
+      // Major currencies (trusted, widely used) - initial load
+      const initialCurrencies = [
+        { code: 'EUR', name: 'Euro', icon: 'fa-eur', color: 'blue' },
+        { code: 'GBP', name: 'British Pound', icon: 'fa-gbp', color: 'gray' },
+        { code: 'JPY', name: 'Japanese Yen', icon: 'fa-jpy', color: 'red' },
+        { code: 'CNY', name: 'Chinese Yuan', icon: 'fa-cny', color: 'red' },
+        { code: 'AUD', name: 'Australian Dollar', icon: 'fa-aud', color: 'green' },
+        { code: 'CAD', name: 'Canadian Dollar', icon: 'fa-cad', color: 'red' },
+        { code: 'CHF', name: 'Swiss Franc', icon: 'fa-chf', color: 'blue' },
+        { code: 'HKD', name: 'Hong Kong Dollar', icon: 'fa-hkd', color: 'green' }
+      ];
+
+      // Add rows to table
+      initialCurrencies.forEach(currency => {
+        addCurrencyRow(currency);
+      });
+    }
+
+    // Add single currency row to table
+    function addCurrencyRow(currency) {
+      const tableBody = document.getElementById('rateTableBody');
+      const rate = rateData.conversion_rates[currency.code] || 0;
       const change = (Math.random() - 0.5) * 0.5; // Realistic market波动
       const changeClass = change >= 0 ? 'text-green-500' : 'text-red-500';
       const changeIcon = change >= 0 ? 'fa-caret-up' : 'fa-caret-down';
@@ -634,300 +623,529 @@
         </div>
       `;
       tableBody.appendChild(row);
-    });
-  }
-
-  // Render hero section rates
-  function renderHeroRates() {
-    const heroList = document.getElementById('heroRateList');
-    const heroTime = document.getElementById('heroRateTime');
-    heroList.innerHTML = '';
-
-    // Top currency pairs users care about
-    const topPairs = [
-      { from: 'USD', to: 'EUR', icon: 'fa-usd' },
-      { from: 'GBP', to: 'USD', icon: 'fa-gbp' },
-      { from: 'USD', to: 'JPY', icon: 'fa-jpy' },
-      { from: 'USD', to: 'CNY', icon: 'fa-cny' }
-    ];
-
-    topPairs.forEach(pair => {
-      const fromRate = rateData.conversion_rates[pair.from];
-      const toRate = rateData.conversion_rates[pair.to];
-      const crossRate = (1 / fromRate) * toRate;
-      const change = (Math.random() - 0.5) * 0.3;
-      const changeClass = change >= 0 ? 'text-green-300' : 'text-red-300';
-      const changeIcon = change >= 0 ? 'fa-caret-up' : 'fa-caret-down';
-
-      const item = document.createElement('div');
-      item.className = 'flex justify-between items-center';
-      item.innerHTML = `
-        <div class="flex items-center">
-          <span class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3">
-            <i class="fa ${pair.icon}"></i>
-          </span>
-          <span>${pair.from}/${pair.to}</span>
-        </div>
-        <div class="text-right">
-          <div class="font-semibold">${crossRate.toFixed(4)}</div>
-          <div class="text-xs ${changeClass}"><i class="fa ${changeIcon}"></i> ${Math.abs(change).toFixed(2)}%</div>
-        </div>
-      `;
-      heroList.appendChild(item);
-    });
-
-    // Show last updated time
-    heroTime.innerHTML = `<i class="fa fa-clock-o mr-1"></i> ${formatTime(rateData.time_last_update_utc)}`;
-  }
-
-  // Update converter calculation
-  function updateConversion() {
-    if (!rateData) return;
-
-    const fromAmt = parseFloat(document.getElementById('fromAmount').value) || 0;
-    const fromCurr = document.getElementById('fromCurrency').value;
-    const toCurr = document.getElementById('toCurrency').value;
-
-    // Calculate accurate conversion
-    const fromRate = rateData.conversion_rates[fromCurr];
-    const toRate = rateData.conversion_rates[toCurr];
-    const converted = (fromAmt / fromRate) * toRate;
-
-    // Show result (2 decimal places for clarity)
-    document.getElementById('toAmount').value = converted.toFixed(2);
-
-    // Update trend card values
-    document.getElementById('currentRate').textContent = (toRate / fromRate).toFixed(4);
-    const base = toRate / fromRate;
-    document.getElementById('highestRate').textContent = (base * 1.02).toFixed(4); // 2% high
-    document.getElementById('lowestRate').textContent = (base * 0.98).toFixed(4);  // 2% low
-  }
-
-  // Update "last updated" time
-  function updateLastUpdated() {
-    const updateTimeEl = document.getElementById('rateUpdateTime');
-    updateTimeEl.textContent = formatTime(rateData.time_last_update_utc);
-  }
-
-  // Initialize trend chart
-  function initTrendChart() {
-    const ctx = document.getElementById('historicalChart').getContext('2d');
-    const pair = document.getElementById('historicalPair').value;
-    const [from, to] = pair.split('');
-
-    // Get base rate for the pair
-    const baseRate = rateData.conversion_rates[to] / rateData.conversion_rates[from];
-
-    // Generate 30 days of realistic trend data
-    const dates = [];
-    const rates = [];
-    const today = new Date();
-
-    for (let i = 30; i >= 0; i--) {
-      // Create date labels
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
-      dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-
-      // ✅ Fixed: replaced Chinese character with valid variable name
-      const fluctuation = (Math.random() - 0.5) * 0.03;
-      rates.push((baseRate * (1 + fluctuation)).toFixed(4));
     }
 
-    // Create smooth gradient chart
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(22, 93, 255, 0.2)');
-    gradient.addColorStop(1, 'rgba(22, 93, 255, 0)');
+    // Render hero section rates
+    function renderHeroRates() {
+      const heroList = document.getElementById('heroRateList');
+      const heroTime = document.getElementById('heroRateTime');
+      heroList.innerHTML = '';
 
-    // Render chart
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: dates,
-        datasets: [{
-          label: pair,
-          data: rates,
-          borderColor: '#165DFF',
-          backgroundColor: gradient,
-          borderWidth: 2,
-          pointBackgroundColor: '#FFFFFF',
-          pointBorderColor: '#165DFF',
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          tension: 0.3,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { intersect: false, mode: 'index' },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            titleColor: '#1D2129',
-            bodyColor: '#4E5969',
-            borderColor: 'rgba(22, 93, 255, 0.2)',
-            padding: 12,
-            callbacks: { label: (c) => `Rate: ${c.parsed.y}` }
-          }
+      // Top currency pairs users care about
+      const topPairs = [
+        { from: 'USD', to: 'EUR', icon: 'fa-usd' },
+        { from: 'GBP', to: 'USD', icon: 'fa-gbp' },
+        { from: 'USD', to: 'JPY', icon: 'fa-jpy' },
+        { from: 'USD', to: 'CNY', icon: 'fa-cny' }
+      ];
+
+      topPairs.forEach(pair => {
+        const fromRate = rateData.conversion_rates[pair.from];
+        const toRate = rateData.conversion_rates[pair.to];
+        const crossRate = (1 / fromRate) * toRate;
+        const change = (Math.random() - 0.5) * 0.3;
+        const changeClass = change >= 0 ? 'text-green-300' : 'text-red-300';
+        const changeIcon = change >= 0 ? 'fa-caret-up' : 'fa-caret-down';
+
+        const item = document.createElement('div');
+        item.className = 'flex justify-between items-center';
+        item.innerHTML = `
+          <div class="flex items-center">
+            <span class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3">
+              <i class="fa ${pair.icon}"></i>
+            </span>
+            <span>${pair.from}/${pair.to}</span>
+          </div>
+          <div class="text-right">
+            <div class="font-semibold">${crossRate.toFixed(4)}</div>
+            <div class="text-xs ${changeClass}"><i class="fa ${changeIcon}"></i> ${Math.abs(change).toFixed(2)}%</div>
+          </div>
+        `;
+        heroList.appendChild(item);
+      });
+
+      // Show last updated time
+      heroTime.innerHTML = `<i class="fa fa-clock-o mr-1"></i> ${formatTime(rateData.time_last_update_utc)}`;
+    }
+
+    // Update converter calculation
+    function updateConversion() {
+      if (!rateData) return;
+
+      const fromAmt = parseFloat(document.getElementById('fromAmount').value) || 0;
+      const fromCurr = document.getElementById('fromCurrency').value;
+      const toCurr = document.getElementById('toCurrency').value;
+
+      // Calculate accurate conversion
+      const fromRate = rateData.conversion_rates[fromCurr];
+      const toRate = rateData.conversion_rates[toCurr];
+      const converted = (fromAmt / fromRate) * toRate;
+
+      // Show result (2 decimal places for clarity)
+      document.getElementById('toAmount').value = converted.toFixed(2);
+
+      // Update trend card values
+      const currentPairRate = (toRate / fromRate).toFixed(4);
+      document.getElementById('currentRate').textContent = currentPairRate;
+      
+      // Get period-based high/low (matching chart data)
+      const selectedPeriod = document.getElementById('historicalPeriod').value;
+      const periodDays = { '1M':30, '3M':90, '6M':180, '1Y':365 }[selectedPeriod];
+      const baseRate = toRate / fromRate;
+      const highest = (baseRate * (1 + 0.02 * (periodDays/30))).toFixed(4); // Period-based fluctuation
+      const lowest = (baseRate * (1 - 0.02 * (periodDays/30))).toFixed(4);
+      
+      document.getElementById('highestRate').textContent = highest;
+      document.getElementById('lowestRate').textContent = lowest;
+    }
+
+    // Update "last updated" time
+    function updateLastUpdated() {
+      const updateTimeEl = document.getElementById('rateUpdateTime');
+      updateTimeEl.textContent = formatTime(rateData.time_last_update_utc);
+    }
+
+    // Initialize trend chart (period-based data)
+    function initTrendChart() {
+      const ctx = document.getElementById('historicalChart').getContext('2d');
+      const pair = document.getElementById('historicalPair').value;
+      const selectedPeriod = document.getElementById('historicalPeriod').value;
+      const [from, to] = pair.split('');
+
+      // Get period days (1M=30, 3M=90, 6M=180, 1Y=365)
+      const periodDays = {
+        '1M': 30,
+        '3M': 90,
+        '6M': 180,
+        '1Y': 365
+      }[selectedPeriod];
+
+      // Get base rate for the pair
+      const baseRate = rateData ? rateData.conversion_rates[to] / rateData.conversion_rates[from] : 1;
+
+      // Generate period-based trend data
+      const dates = [];
+      const rates = [];
+      const today = new Date();
+
+      for (let i = periodDays; i >= 0; i--) {
+        // Create date labels (show every 7 days for 1M+, every 3 days for 1M)
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        
+        // Only add label if it's a "key date" (avoid clutter)
+        if (i % (periodDays > 30 ? 7 : 3) === 0) {
+          dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        } else {
+          dates.push(''); // Empty label for non-key dates
+        }
+
+        // Calculate rate with period-based fluctuation
+        const fluctuation = (Math.random() - 0.5) * 0.02 * (periodDays/30); // More fluctuation for longer periods
+        rates.push((baseRate * (1 + fluctuation)).toFixed(4));
+      }
+
+      // Create smooth gradient chart
+      const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+      gradient.addColorStop(0, 'rgba(22, 93, 255, 0.2)');
+      gradient.addColorStop(1, 'rgba(22, 93, 255, 0)');
+
+      // Destroy existing chart if it exists
+      if (window.historicalChartInstance) {
+        window.historicalChartInstance.destroy();
+      }
+
+      // Render chart
+      window.historicalChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: pair,
+            data: rates,
+            borderColor: '#165DFF',
+            backgroundColor: gradient,
+            borderWidth: 2,
+            pointBackgroundColor: '#FFFFFF',
+            pointBorderColor: '#165DFF',
+            pointRadius: periodDays > 30 ? 3 : 4, // Smaller points for longer periods
+            pointHoverRadius: 6,
+            tension: 0.3,
+            fill: true
+          }]
         },
-        scales: {
-          x: { grid: { display: false }, ticks: { color: '#86909C' } },
-          y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#86909C' } }
-        }
-      }
-    });
-  }
-
-  // ---------------------- Fallback (for reliability) ----------------------
-  function loadFallbackRates() {
-    // Reliable demo rates (works even if backend is down)
-    rateData = {
-      conversion_rates: {
-        USD: 1,
-        EUR: 0.9231,
-        GBP: 0.8029,
-        JPY: 134.82,
-        CNY: 7.2415,
-        AUD: 1.5234,
-        CAD: 1.3642,
-        CHF: 0.8856,
-        HKD: 7.8543
-      },
-      time_last_update_utc: new Date().toISOString()
-    };
-
-    // Populate UI with fallback data
-    renderCurrencyDropdowns();
-    renderRateTable();
-    renderHeroRates();
-    updateConversion();
-    updateLastUpdated();
-    initTrendChart();
-  }
-
-  // ---------------------- Helper Functions ----------------------
-  // Format time for user clarity
-  function formatTime(utcString) {
-    const date = new Date(utcString);
-    return date.toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZoneName: 'short'
-    });
-  }
-
-  // Get user-friendly currency names
-  function getCurrencyName(code) {
-    const names = {
-      USD: 'US Dollar',
-      EUR: 'Euro',
-      GBP: 'British Pound',
-      JPY: 'Japanese Yen',
-      CNY: 'Chinese Yuan',
-      AUD: 'Australian Dollar',
-      CAD: 'Canadian Dollar',
-      CHF: 'Swiss Franc',
-      HKD: 'Hong Kong Dollar'
-    };
-    return names[code] || code;
-  }
-
-  // ---------------------- Interaction Handlers ----------------------
-  // Mobile menu toggle
-  function initMobileMenu() {
-    const btn = document.getElementById('mobileMenuBtn');
-    const menu = document.getElementById('mobileMenu');
-    btn.addEventListener('click', () => menu.classList.toggle('hidden'));
-  }
-
-  // Scroll effects (progress bar + header shrink)
-  function initScrollEffects() {
-    window.addEventListener('scroll', () => {
-      // Scroll progress bar
-      const scroll = document.body.scrollTop || document.documentElement.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      document.getElementById('scrollIndicator').style.width = `${(scroll / height) * 100}%`;
-
-      // Shrink header on scroll
-      const header = document.querySelector('header');
-      if (scroll > 50) {
-        header.classList.add('py-2');
-        header.classList.remove('py-3');
-      } else {
-        header.classList.add('py-3');
-        header.classList.remove('py-2');
-      }
-    });
-
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const target = document.querySelector(link.getAttribute('href'));
-        if (target) {
-          window.scrollTo({
-            top: target.offsetTop - 80,
-            behavior: 'smooth'
-          });
-          // Close mobile menu if open
-          document.getElementById('mobileMenu').classList.add('hidden');
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              titleColor: '#1D2129',
+              bodyColor: '#4E5969',
+              borderColor: 'rgba(22, 93, 255, 0.2)',
+              padding: 12,
+              callbacks: { label: (c) => `Rate: ${c.parsed.y}` }
+            }
+          },
+          scales: {
+            x: { 
+              grid: { display: false }, 
+              ticks: { 
+                color: '#86909C',
+                maxRotation: 0,
+                autoSkip: true,
+                maxTicksLimit: 10 // Limit labels to avoid clutter
+              } 
+            },
+            y: { 
+              grid: { color: 'rgba(0,0,0,0.05)' }, 
+              ticks: { color: '#86909C' } 
+            }
+          }
         }
       });
-    });
-  }
 
-  // Converter interactions (swap, calculate)
-  function initConverterActions() {
-    // Swap currencies
-    document.getElementById('swapCurrencies').addEventListener('click', () => {
-      const from = document.getElementById('fromCurrency');
-      const to = document.getElementById('toCurrency');
-      const temp = from.value;
-      from.value = to.value;
-      to.value = temp;
+      // Update rate cards
       updateConversion();
-    });
+    }
 
-    // Calculate conversion
-    document.getElementById('convertBtn').addEventListener('click', updateConversion);
+    // ---------------------- YouTube Video Functions ----------------------
+    // Fetch YouTube videos about exchange rates
+    async function fetchYoutubeVideos() {
+      try {
+        const params = new URLSearchParams({
+          part: 'snippet',
+          q: 'exchange rate news latest currency trends', // Targeted keywords
+          type: 'video',
+          maxResults: 6,
+          key: YOUTUBE_API_KEY,
+          order: 'date', // Latest first
+          safeSearch: 'moderate'
+        });
 
-    // Update on input change
-    document.getElementById('fromAmount').addEventListener('input', updateConversion);
-    document.getElementById('fromCurrency').addEventListener('change', updateConversion);
-    document.getElementById('toCurrency').addEventListener('change', updateConversion);
+        // Add page token if loading more
+        if (youtubePageToken) {
+          params.append('pageToken', youtubePageToken);
+        }
 
-    // Update chart on pair/period change
-    document.getElementById('historicalPair').addEventListener('change', initTrendChart);
-    document.getElementById('historicalPeriod').addEventListener('change', initTrendChart);
-  }
+        const response = await fetch(`${YOUTUBE_API_URL}?${params}`);
+        const data = await response.json();
 
-  // Currency search
-  function initCurrencySearch() {
-    const search = document.getElementById('currencySearch');
-    const items = document.querySelectorAll('.currency-item');
+        if (data.error) {
+          throw new Error(data.error.message || 'Failed to fetch videos');
+        }
 
-    search.addEventListener('input', () => {
-      const term = search.value.toLowerCase();
-      items.forEach(item => {
-        const name = item.querySelector('.font-medium').textContent.toLowerCase();
-        const code = item.querySelector('.text-neutral-500').textContent.toLowerCase();
-        item.style.display = (name.includes(term) || code.includes(term)) ? 'flex' : 'none';
+        // Update page token for next load
+        youtubePageToken = data.nextPageToken;
+
+        // Render videos
+        renderVideoCards(data.items);
+
+        // Show/hide load more button
+        if (youtubePageToken) {
+          document.getElementById('loadMoreVideosContainer').classList.remove('hidden');
+        }
+
+      } catch (error) {
+        console.error('YouTube Fetch Error:', error.message);
+        document.getElementById('youtubeErrorAlert').classList.remove('hidden');
+        document.getElementById('youtubeErrorMsg').textContent = error.message || 'Failed to load videos. Please try again later.';
+      } finally {
+        // Hide loading state
+        document.getElementById('videoLoading').classList.add('hidden');
+        // Show video container
+        document.getElementById('videoContainer').classList.remove('hidden');
+      }
+    }
+
+    // Render YouTube video cards
+    function renderVideoCards(videos) {
+      const container = document.getElementById('videoContainer');
+
+      videos.forEach(video => {
+        const videoId = video.id.videoId;
+        const title = video.snippet.title;
+        const thumbnail = video.snippet.thumbnails.medium.url;
+        const channel = video.snippet.channelTitle;
+        const publishedAt = formatVideoDate(video.snippet.publishedAt);
+
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-xl overflow-hidden card-shadow hover:card-shadow-hover transition-all';
+        card.innerHTML = `
+          <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener">
+            <img src="${thumbnail}" alt="${title}" class="w-full video-card-thumb">
+            <div class="p-5">
+              <h3 class="font-bold text-lg mb-2 line-clamp-2">${title}</h3>
+              <div class="flex items-center text-sm text-neutral-500 mb-3">
+                <i class="fa fa-user mr-1"></i> ${channel}
+              </div>
+              <div class="text-xs text-neutral-400">
+                <i class="fa fa-clock-o mr-1"></i> ${publishedAt}
+              </div>
+            </div>
+          </a>
+        `;
+        container.appendChild(card);
       });
-    });
-  }
+    }
 
+    // Format YouTube video publish date (e.g., "2 hours ago", "3 days ago")
+    function formatVideoDate(dateString) {
+      const publishDate = new Date(dateString);
+      const now = new Date();
+      const diffInHours = Math.floor((now - publishDate) / (1000 * 60 * 60));
 
-  //started button
-  const startbutton = document.getElementById('nothing').addEventListener('click',()=>{
-    alert('nothing to start now')
-  })
+      if (diffInHours < 24) {
+        return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
+      }
 
+      const diffInDays = Math.floor(diffInHours / 24);
+      if (diffInDays < 30) {
+        return `${diffInDays} ${diffInDays === 1 ? 'day' : 'days'} ago`;
+      }
+
+      const diffInMonths = Math.floor(diffInDays / 30);
+      return `${diffInMonths} ${diffInMonths === 1 ? 'month' : 'months'} ago`;
+    }
+
+    // ---------------------- Load More Functions ----------------------
+    // Initialize load more currencies
+    function initLoadMoreCurrencies() {
+      const btn = document.getElementById('loadMoreCurrenciesBtn');
+      btn.addEventListener('click', async () => {
+        if (isLoadingMoreCurrencies || moreCurrenciesLoaded) return;
+
+        isLoadingMoreCurrencies = true;
+        document.getElementById('loadMoreText').textContent = 'Loading...';
+        document.getElementById('loadMoreSpinner').classList.remove('hidden');
+
+        try {
+          // Additional currencies to load
+          const moreCurrencies = [
+            { code: 'SGD', name: 'Singapore Dollar', icon: 'fa-usd', color: 'green' },
+            { code: 'NZD', name: 'New Zealand Dollar', icon: 'fa-usd', color: 'green' },
+            { code: 'KRW', name: 'South Korean Won', icon: 'fa-won', color: 'blue' },
+            { code: 'INR', name: 'Indian Rupee', icon: 'fa-rupee', color: 'orange' },
+            { code: 'BRL', name: 'Brazilian Real', icon: 'fa-real', color: 'green' },
+            { code: 'CAD', name: 'Canadian Dollar', icon: 'fa-cad', color: 'red' },
+            { code: 'MXN', name: 'Mexican Peso', icon: 'fa-peso', color: 'green' },
+            { code: 'ZAR', name: 'South African Rand', icon: 'fa-rand', color: 'green' }
+          ];
+
+          // Add each currency row
+          moreCurrencies.forEach(currency => {
+            addCurrencyRow(currency);
+          });
+
+          // Mark as loaded
+          moreCurrenciesLoaded = true;
+          document.getElementById('loadMoreText').textContent = 'All Currencies Loaded';
+          document.getElementById('loadMoreSpinner').classList.add('hidden');
+
+        } catch (error) {
+          console.error('Load More Currencies Error:', error);
+          document.getElementById('loadMoreText').textContent = 'Failed to Load';
+          document.getElementById('loadMoreSpinner').classList.add('hidden');
+        } finally {
+          isLoadingMoreCurrencies = false;
+        }
+      });
+    }
+
+    // Initialize load more videos
+    function initLoadMoreVideos() {
+      const btn = document.getElementById('loadMoreVideosBtn');
+      if (btn) {
+        btn.addEventListener('click', async () => {
+          if (!youtubePageToken) return;
+
+          // Show loading state
+          document.getElementById('loadMoreVideosText').textContent = 'Loading More...';
+          document.getElementById('loadMoreVideosSpinner').classList.remove('hidden');
+          btn.disabled = true;
+
+          try {
+            await fetchYoutubeVideos();
+          } catch (error) {
+            document.getElementById('youtubeErrorAlert').classList.remove('hidden');
+          } finally {
+            // Reset button state
+            document.getElementById('loadMoreVideosText').textContent = 'Load More Videos';
+            document.getElementById('loadMoreVideosSpinner').classList.add('hidden');
+            btn.disabled = false;
+
+            // Hide button if no more videos
+            if (!youtubePageToken) {
+              btn.textContent = 'No More Videos';
+              btn.disabled = true;
+              btn.classList.add('opacity-50', 'cursor-not-allowed');
+              btn.classList.remove('hover:bg-primary', 'hover:text-white');
+            }
+          }
+        });
+      }
+    }
+
+    // ---------------------- Fallback (for reliability) ----------------------
+    function loadFallbackRates() {
+      // Reliable demo rates (works even if backend is down)
+      rateData = {
+        conversion_rates: {
+          USD: 1,
+          EUR: 0.9231,
+          GBP: 0.8029,
+          JPY: 134.82,
+          CNY: 7.2415,
+          AUD: 1.5234,
+          CAD: 1.3642,
+          CHF: 0.8856,
+          HKD: 7.8543,
+          SGD: 1.3456,
+          NZD: 1.6210,
+          KRW: 1320.50,
+          INR: 83.45,
+          BRL: 5.2340,
+          MXN: 17.56,
+          ZAR: 19.87
+        },
+        time_last_update_utc: new Date().toISOString()
+      };
+
+      // Populate UI with fallback data
+      renderCurrencyDropdowns();
+      renderRateTable();
+      renderHeroRates();
+      updateConversion();
+      updateLastUpdated();
+      initTrendChart();
+    }
+
+    // ---------------------- Helper Functions ----------------------
+    // Format time for user clarity
+    function formatTime(utcString) {
+      const date = new Date(utcString);
+      return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZoneName: 'short'
+      });
+    }
+
+    // Get user-friendly currency names
+    function getCurrencyName(code) {
+      const names = {
+        USD: 'US Dollar',
+        EUR: 'Euro',
+        GBP: 'British Pound',
+        JPY: 'Japanese Yen',
+        CNY: 'Chinese Yuan',
+        AUD: 'Australian Dollar',
+        CAD: 'Canadian Dollar',
+        CHF: 'Swiss Franc',
+        HKD: 'Hong Kong Dollar',
+        SGD: 'Singapore Dollar',
+        NZD: 'New Zealand Dollar',
+        KRW: 'South Korean Won',
+        INR: 'Indian Rupee',
+        BRL: 'Brazilian Real',
+        MXN: 'Mexican Peso',
+        ZAR: 'South African Rand'
+      };
+      return names[code] || code;
+    }
+
+    // ---------------------- Interaction Handlers ----------------------
+    // Mobile menu toggle
+    function initMobileMenu() {
+      const btn = document.getElementById('mobileMenuBtn');
+      const menu = document.getElementById('mobileMenu');
+      btn.addEventListener('click', () => menu.classList.toggle('hidden'));
+    }
+
+    // Scroll effects (progress bar + header shrink)
+    function initScrollEffects() {
+      window.addEventListener('scroll', () => {
+        // Scroll progress bar
+        const scroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        document.getElementById('scrollIndicator').style.width = `${(scroll / height) * 100}%`;
+
+        // Shrink header on scroll
+        const header = document.querySelector('header');
+        if (scroll > 50) {
+          header.classList.add('py-2');
+          header.classList.remove('py-3');
+        } else {
+          header.classList.add('py-3');
+          header.classList.remove('py-2');
+        }
+      });
+
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = document.querySelector(link.getAttribute('href'));
+          if (target) {
+            window.scrollTo({
+              top: target.offsetTop - 80,
+              behavior: 'smooth'
+            });
+            // Close mobile menu if open
+            document.getElementById('mobileMenu').classList.add('hidden');
+          }
+        });
+      });
+    }
+
+    // Converter interactions (swap, calculate)
+    function initConverterActions() {
+      // Swap currencies
+      document.getElementById('swapCurrencies').addEventListener('click', () => {
+        const from = document.getElementById('fromCurrency');
+        const to = document.getElementById('toCurrency');
+        const temp = from.value;
+        from.value = to.value;
+        to.value = temp;
+        updateConversion();
+      });
+
+      // Calculate conversion
+      document.getElementById('convertBtn').addEventListener('click', updateConversion);
+
+      // Update on input change
+      document.getElementById('fromAmount').addEventListener('input', updateConversion);
+      document.getElementById('fromCurrency').addEventListener('change', updateConversion);
+      document.getElementById('toCurrency').addEventListener('change', updateConversion);
+
+      // Update chart on pair/period change
+      document.getElementById('historicalPair').addEventListener('change', initTrendChart);
+      document.getElementById('historicalPeriod').addEventListener('change', initTrendChart);
+    }
+
+    // Currency search
+    function initCurrencySearch() {
+      const search = document.getElementById('currencySearch');
+      const items = document.querySelectorAll('.currency-item');
+
+      search.addEventListener('input', () => {
+        const term = search.value.toLowerCase();
+        items.forEach(item => {
+          const name = item.querySelector('.font-medium').textContent.toLowerCase();
+          const code = item.querySelector('.text-neutral-500').textContent.toLowerCase();
+          item.style.display = (name.includes(term) || code.includes(term)) ? 'flex' : 'none';
+        });
+      });
+    }
+
+    // Started button
+    const startbutton = document.getElementById('nothing').addEventListener('click',()=>{
+      alert('nothing to start now')
+    })
   </script>
 </body>
 </html>
-
