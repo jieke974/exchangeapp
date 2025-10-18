@@ -483,8 +483,6 @@
   <!-- Frontend JS (Connected to Backend) -->
   <script>
     const BACKEND_URL = '/api/exchange-rates';
-    const YOUTUBE_API_KEY = "AIzaSyAfgiBC8u6zfJAlfUSa1lF984G6IutFK_U";
-    const YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3/search";
     let rateData = null;
     let youtubePageToken = null;
     let isLoadingMoreCurrencies = false;
@@ -811,104 +809,101 @@
       updateConversion();
     }
 
+
     // ---------------------- YouTube Video Functions ----------------------
-    // Fetch YouTube videos about exchange rates
-    async function fetchYoutubeVideos() {
-      try {
-        const params = new URLSearchParams({
-          part: 'snippet',
-          q: 'exchange rate news latest currency trends', // Targeted keywords
-          type: 'video',
-          maxResults: 6,
-          key: YOUTUBE_API_KEY,
-          order: 'date', // Latest first
-          safeSearch: 'moderate'
-        });
+// Fetch YouTube videos through backend proxy
+async function fetchYoutubeVideos() {
+  try {
+    const params = new URLSearchParams({
+      q: 'exchange rate news latest currency trends', // Keywords
+      maxResults: 50,
+      order: 'date',
+      safeSearch: 'moderate'
+    });
 
-        // Add page token if loading more
-        if (youtubePageToken) {
-          params.append('pageToken', youtubePageToken);
-        }
-
-        const response = await fetch(`${YOUTUBE_API_URL}?${params}`);
-        const data = await response.json();
-
-        if (data.error) {
-          throw new Error(data.error.message || 'Failed to fetch videos');
-        }
-
-        // Update page token for next load
-        youtubePageToken = data.nextPageToken;
-
-        // Render videos
-        renderVideoCards(data.items);
-
-        // Show/hide load more button
-        if (youtubePageToken) {
-          document.getElementById('loadMoreVideosContainer').classList.remove('hidden');
-        }
-
-      } catch (error) {
-        console.error('YouTube Fetch Error:', error.message);
-        document.getElementById('youtubeErrorAlert').classList.remove('hidden');
-        document.getElementById('youtubeErrorMsg').textContent = error.message || 'Failed to load videos. Please try again later.';
-      } finally {
-        // Hide loading state
-        document.getElementById('videoLoading').classList.add('hidden');
-        // Show video container
-        document.getElementById('videoContainer').classList.remove('hidden');
-      }
+    // Add page token if loading more
+    if (youtubePageToken) {
+      params.append('pageToken', youtubePageToken);
     }
 
-    // Render YouTube video cards
-    function renderVideoCards(videos) {
-      const container = document.getElementById('videoContainer');
+    // Call our backend instead of YouTube directly
+    const response = await fetch(`/api/youtube-videos?${params}`);
+    const data = await response.json();
 
-      videos.forEach(video => {
-        const videoId = video.id.videoId;
-        const title = video.snippet.title;
-        const thumbnail = video.snippet.thumbnails.medium.url;
-        const channel = video.snippet.channelTitle;
-        const publishedAt = formatVideoDate(video.snippet.publishedAt);
-
-        const card = document.createElement('div');
-        card.className = 'bg-white rounded-xl overflow-hidden card-shadow hover:card-shadow-hover transition-all';
-        card.innerHTML = `
-          <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener">
-            <img src="${thumbnail}" alt="${title}" class="w-full video-card-thumb">
-            <div class="p-5">
-              <h3 class="font-bold text-lg mb-2 line-clamp-2">${title}</h3>
-              <div class="flex items-center text-sm text-neutral-500 mb-3">
-                <i class="fa fa-user mr-1"></i> ${channel}
-              </div>
-              <div class="text-xs text-neutral-400">
-                <i class="fa fa-clock-o mr-1"></i> ${publishedAt}
-              </div>
-            </div>
-          </a>
-        `;
-        container.appendChild(card);
-      });
+    if (data.error) {
+      throw new Error(data.error || 'Failed to fetch videos');
     }
 
-    // Format YouTube video publish date (e.g., "2 hours ago", "3 days ago")
-    function formatVideoDate(dateString) {
-      const publishDate = new Date(dateString);
-      const now = new Date();
-      const diffInHours = Math.floor((now - publishDate) / (1000 * 60 * 60));
+    // Update page token for next load
+    youtubePageToken = data.nextPageToken;
 
-      if (diffInHours < 24) {
-        return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
-      }
+    // Render videos
+    renderVideoCards(data.items);
 
-      const diffInDays = Math.floor(diffInHours / 24);
-      if (diffInDays < 30) {
-        return `${diffInDays} ${diffInDays === 1 ? 'day' : 'days'} ago`;
-      }
+    // Show/hide load more button
+    document.getElementById('loadMoreVideosContainer').classList.toggle('hidden', !youtubePageToken);
 
-      const diffInMonths = Math.floor(diffInDays / 30);
-      return `${diffInMonths} ${diffInMonths === 1 ? 'month' : 'months'} ago`;
-    }
+  } catch (error) {
+    console.error('YouTube Fetch Error:', error.message);
+    document.getElementById('youtubeErrorAlert').classList.remove('hidden');
+    document.getElementById('youtubeErrorMsg').textContent = error.message || 'Failed to load videos. Please try again later.';
+  } finally {
+    // Hide loading state
+    document.getElementById('videoLoading').classList.add('hidden');
+    // Show video container
+    document.getElementById('videoContainer').classList.remove('hidden');
+  }
+}
+
+// Render YouTube video cards (unchanged)
+function renderVideoCards(videos) {
+  const container = document.getElementById('videoContainer');
+
+  videos.forEach(video => {
+    const videoId = video.id.videoId;
+    const title = video.snippet.title;
+    const thumbnail = video.snippet.thumbnails.medium.url;
+    const channel = video.snippet.channelTitle;
+    const publishedAt = formatVideoDate(video.snippet.publishedAt);
+
+    const card = document.createElement('div');
+    card.className = 'bg-white rounded-xl overflow-hidden card-shadow hover:card-shadow-hover transition-all';
+    card.innerHTML = `
+      <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener">
+        <img src="${thumbnail}" alt="${title}" class="w-full video-card-thumb">
+        <div class="p-5">
+          <h3 class="font-bold text-lg mb-2 line-clamp-2">${title}</h3>
+          <div class="flex items-center text-sm text-neutral-500 mb-3">
+            <i class="fa fa-user mr-1"></i> ${channel}
+          </div>
+          <div class="text-xs text-neutral-400">
+            <i class="fa fa-clock-o mr-1"></i> ${publishedAt}
+          </div>
+        </div>
+      </a>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// Format YouTube video publish date (unchanged)
+function formatVideoDate(dateString) {
+  const publishDate = new Date(dateString);
+  const now = new Date();
+  const diffInHours = Math.floor((now - publishDate) / (1000 * 60 * 60));
+
+  if (diffInHours < 24) {
+    return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
+  }
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 30) {
+    return `${diffInDays} ${diffInDays === 1 ? 'day' : 'days'} ago`;
+  }
+
+  const diffInMonths = Math.floor(diffInDays / 30);
+  return `${diffInMonths} ${diffInMonths === 1 ? 'month' : 'months'} ago`;
+}
 
     // ---------------------- Load More Functions ----------------------
     // Initialize load more currencies

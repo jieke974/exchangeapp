@@ -42,6 +42,49 @@ app.get('/', (req, res) => {
 
 
 
+// New: YouTube API proxy endpoint
+app.get('/api/youtube-videos', async (req, res) => {
+  try {
+    // Get parameters from frontend request
+    const { 
+      q = 'exchange rate news latest currency trends', 
+      pageToken, 
+      maxResults = 6, 
+      order = 'date', 
+      safeSearch = 'moderate' 
+    } = req.query;
+
+    // Validate API key
+    if (!process.env.YOUTUBE_API_KEY) {
+      throw new Error('YouTube API key not configured');
+    }
+
+    // Build YouTube API request
+    const params = new URLSearchParams({
+      part: 'snippet',
+      q,
+      type: 'video',
+      maxResults,
+      key: process.env.YOUTUBE_API_KEY, // Key stays server-side
+      order,
+      safeSearch
+    });
+
+    if (pageToken) params.append('pageToken', pageToken);
+
+    const response = await axios.get(
+      `https://www.googleapis.com/youtube/v3/search?${params}`
+    );
+
+    res.json(response.data);
+
+  } catch (error) {
+    console.error('YouTube Proxy Error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 
 app.listen(8000)
 export default app;
